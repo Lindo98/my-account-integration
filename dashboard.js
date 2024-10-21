@@ -1,3 +1,15 @@
+function _getProject(_id) {
+  let _store = window.localStorage.getItem("pprint-projects") || {};
+  if (typeof _store === "string") _store = JSON.parse(_store);
+  return _store[_id];
+}
+function _decode(_str) {
+  let _val = JSON.parse(decodeURIComponent(_str));
+  if (_val.projectId)
+    _val.preview = `https://s3-eu-west-1.amazonaws.com/pitchprint.io/previews/${_val.projectId}_1.jpg`;
+  return _val;
+}
+
 const apiURL = "https://api.pitchprint.io/client/fetch-recent";
 
 fetch(apiURL, {
@@ -44,6 +56,21 @@ fetch(apiURL, {
           // customer will change the path back to the product page
           window.location.href = `index.html?id=${project.id} `;
         });
+
+        projectDiv
+          .querySelector(".delete-btn")
+          .addEventListener("click", () => {
+            // remove the project from the projects list
+            const projects = window.localStorage.getItem("pprint-projects");
+            if (projects) {
+              const projectsObj = JSON.parse(projects);
+              delete projectsObj[project.id];
+              window.localStorage.setItem(
+                "pprint-projects",
+                JSON.stringify(projectsObj)
+              );
+            }
+          });
 
         //add an event listener to the delete button also Delete the project from the database
 

@@ -9,10 +9,10 @@ _launchButton.setAttribute("disabled", "disabled");
 
 var ppClient = new PitchPrintClient({
   apiKey: "key_26edfc2cb57d64ce529a3a9e098c63bd",
-  designId: "d42302b363615e5572feae8060eed01c",
+  designId: "cc755bd3d460dafa86ebd68e5f7e0223",
   userId: "37063281-a764-4b5b-8163-cec7ab1884a9",
+  preview: true,
   custom: true,
-  userAccountPath: "/dashboard.html",
 });
 
 function doClient() {
@@ -35,7 +35,7 @@ function doClient() {
     mode:
       _cValues.type === "u" ? "upload" : _cValues.projectId ? "edit" : "new",
     projectId: _cValues.projectId || "",
-    apiKey: window.Shopify.shop,
+    apiKey: "",
     product: {
       id: _productId,
       name: window.__st.pageurl.split("/").pop().split("-").join(" "),
@@ -54,40 +54,40 @@ var appValidated = () => {
 
 // This function will run when the app has been used and user has saved some projects
 
-// var projectSaved = (_val) => {
-//   var _el = document.getElementById("_pitchprint"),
-//     _projectId = _val.data.projectId;
+var projectSaved = (_val) => {
+  var _el = document.getElementById("_pitchprint"),
+    _projectId = _val.data.projectId;
 
-//   let _store = window.localStorage.getItem("pprint-sp") || {},
-//     _projects = window.localStorage.getItem("pprint-projects") || {};
+  let _store = window.localStorage.getItem("pprint-custom") || {},
+    _projects = window.localStorage.getItem("pprint-projects") || {};
 
-//   if (typeof _store === "string") _store = JSON.parse(_store);
-//   if (typeof _projects === "string") _projects = JSON.parse(_projects);
+  if (typeof _store === "string") _store = JSON.parse(_store);
+  if (typeof _projects === "string") _projects = JSON.parse(_projects);
 
-//   if (_val.data.clear) {
-//     _el.value = "";
-//     delete _store[_productId];
-//     delete _projects[_projectId];
-//   } else {
-//     _el.value = _projectId;
-//     _store[_productId] = _val.data.values;
-//     _projects[_projectId] = _val.data.values;
-//     if (_projectId.substr(0, 2) === "U-") {
-//       delete _projects[_projectId].previews;
-//       _zipFiles(_val.data.values);
-//       console.log(_projects[_projectId]);
-//     }
-//   }
-//   window.localStorage.setItem("pprint-sp", JSON.stringify(_store));
-//   window.localStorage.setItem("pprint-projects", JSON.stringify(_projects));
-//   if (_val.data.clear) window.location.reload();
-// };
-// function _zipFiles(_val) {
-//   _val = _decode(_val);
-//   window.ppclient
-//     ._comm("zip-uploads", { files: _val.files, id: _val.projectId })
-//     .catch(console.log);
-// }
+  if (_val.data.clear) {
+    _el.value = "";
+    delete _store[_productId];
+    delete _projects[_projectId];
+  } else {
+    _el.value = _projectId;
+    _store[_productId] = _val.data.values;
+    _projects[_projectId] = _val.data.values;
+    if (_projectId.substr(0, 2) === "U-") {
+      delete _projects[_projectId].previews;
+      _zipFiles(_val.data.values);
+      console.log(_projects[_projectId]);
+    }
+  }
+  window.localStorage.setItem("pprint-custom", JSON.stringify(_store));
+  window.localStorage.setItem("pprint-projects", JSON.stringify(_projects));
+  if (_val.data.clear) window.location.reload();
+};
+function _zipFiles(_val) {
+  _val = _decode(_val);
+  window.ppclient
+    ._comm("zip-uploads", { files: _val.files, id: _val.projectId })
+    .catch(console.log);
+}
 
 ppClient.on("app-validated", appValidated);
-// ppClient.on("project-saved", projectSaved);
+ppClient.on("project-saved", projectSaved);

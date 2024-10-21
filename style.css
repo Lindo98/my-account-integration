@@ -108,3 +108,9 @@ p {
   text-align: center;
   border-radius: 10px;
 } */
+
+/* ------------------------------------------- */
+
+.modal {
+  display: none;
+}
