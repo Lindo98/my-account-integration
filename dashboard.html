@@ -7,7 +7,6 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://pitchprint.io/rsc/js/client.js"></script>
     <link rel="stylesheet" href="style.css" />
-    <title>Custom integration</title>
   </head>
   <body>
     <div><i class="fa-solid fa-arrow-left" style="color: #2ae9f0"></i></div>
@@ -15,14 +14,70 @@
 
     <div class="container">
       <nav class="menus">
-        <a href="#" id="view-projects">Projects</a>
-        <a href="#">Personal details</a>
-        <a href="#">Addresses</a>
+        <h3>Projects</h3>
       </nav>
 
-      <div class="content"></div>
+      <div id="content">
+        <h3>Saved Projects</h3>
+        <div id="contentPreview"></div>
+      </div>
     </div>
 
-    <script src="/main.js"></script>
+    <script>
+      const apiURL = "https://api.pitchprint.io/client/fetch-recent";
+
+      fetch(apiURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          saveForLater: "",
+          token:
+            "4ae0afe5028cb7fe6d28015768900358:e6a37f6eeafaefd9b8b2e94065f69372a7277c4e24341f8ebcbdf48a9c86932b671c02f414af1d45e5e5fd77abf35a44c5ff8a260fd8e695e00905e2c5185b8d9b446e2adf382f24714ad63270df5293e024475e746199092bb319f8b8e43e9ec005ca478ff8405fc61c496ad6b0ab7e5fdd8243d1dcb3ad958974fdd0e0e0bd986a27464e0f4cda4ada65275e02f5589b22e9472f03b06128146e3c02f8950c2b1214755937baf9f4ed3b20bdcefdfc590c2f6473766cc99b8947483a543aba3c9e1ecd41631f5d4bd99693b5443b374f4173231e4e6af02904fd4b96500da8",
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          // display data
+
+          const contentPreview = document.getElementById("content");
+
+          if (data.data.length > 0) {
+            data.data.forEach((project) => {
+              // Create a div element for each project
+              const projectDiv = document.createElement("div");
+
+              //style the div created for each project
+              projectDiv.style.backgroundColor = "white";
+              projectDiv.style.padding = "10px";
+              projectDiv.style.borderRadius = "10px";
+              projectDiv.style.boxShadow = "0 5px 10px rgba(0, 0, 0, 0.1)";
+              projectDiv.style.margin = "150px";
+
+              // show the image if the project has an image
+
+              projectDiv.innerHTML += `<img src="${project.image}" />`;
+
+              projectDiv.innerHTML += `<p>User Id: ${project.userId}</p>`;
+              projectDiv.innerHTML += `<button class="view-btn">View</button>`;
+              projectDiv.innerHTML += `<button class="delete-btn">Delete</button>`;
+
+              // Add an event listener to the button
+              projectDiv
+                .querySelector(".view-btn")
+                .addEventListener("click", () => {
+                  // the path will be back to the product page
+                  window.location.href = `index.html?id=${project.id} `;
+                });
+
+              //add an event listener to the delete button also Delete the project from the database
+
+              contentPreview.appendChild(projectDiv);
+            });
+          }
+        });
+    </script>
   </body>
 </html>
