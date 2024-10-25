@@ -1,12 +1,12 @@
 :root {
-  --primary-color: #2ae9f0;
+  --primary-color: #18f4fc;
   --secondary-color: #f5f2fe;
   --third-color: #f1e8e8;
   --box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 
   --h1-font-size: 48px;
   --h2-font-size: 28px;
-  --h3-font-size: 24px;
+  --h3-font-size: 18px;
   --normal-font-size: 18px;
   --small-font-size: 16px;
   --smaller-font-size: 14px;
@@ -34,6 +34,13 @@ h1 {
 h2 {
   font-size: var(--h2-font-size);
   line-height: 50px;
+  color: var(--primary-text-color);
+}
+
+h3 {
+  font-size: var(--h3-font-size);
+  color: var(--primary-text-color);
+  margin-top: 18px;
 }
 
 p {
@@ -50,6 +57,7 @@ p {
   display: block;
   text-align: center;
   margin-top: 50px;
+  border-radius: 10px;
 }
 
 .container {
@@ -75,21 +83,21 @@ p {
 }
 
 #content {
-  background-color: var(--third-color);
   padding: 10px;
-  color: var(--primary-text-color);
-  font-size: var(--small-font-size);
-  text-align: center;
   border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+  margin: 30px;
 }
 
 .view-btn,
 .delete-btn {
-  margin: 10px;
+  margin: 15px 10px;
   background-color: #1ecbe1;
   border: none;
   border-radius: 10px;
-  padding: 10px 20px;
+  padding: 10px 35px;
   color: #fff;
   cursor: pointer;
   font-size: 16px;
@@ -98,4 +106,17 @@ p {
 
 .hidden {
   display: none;
+}
+
+.project-img {
+  width: 70%;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
+@media screen and (max-width: 800px) {
+  #content {
+    grid-template-columns: 1fr;
+    margin: 0 auto;
+  }
 }

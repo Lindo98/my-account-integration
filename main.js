@@ -9,7 +9,7 @@ _launchButton.setAttribute("disabled", "disabled");
 
 var ppClient = new PitchPrintClient({
   apiKey: "key_26edfc2cb57d64ce529a3a9e098c63bd",
-  designId: "cc755bd3d460dafa86ebd68e5f7e0223",
+  designId: "d42302b363615e5572feae8060eed01c",
   userId: "37063281-a764-4b5b-8163-cec7ab1884a9",
   custom: true,
 });
@@ -31,7 +31,6 @@ function doClient() {
   window.ppclient = new PitchPrintClient({
     userId: window.__st.cid,
     designId: _values.designId,
-    previews: _cValues.previews || _cValues.numPages,
     mode:
       _cValues.type === "u" ? "upload" : _cValues.projectId ? "edit" : "new",
     projectId: _cValues.projectId || "",
@@ -62,45 +61,7 @@ const openModal = function () {
 };
 
 openModalBtn.addEventListener("click", openModal);
-
-// This function will run when the app has been used and user has saved some projects
-
-var projectSaved = (_val) => {
-  var _el = document.getElementById("_pitchprint"),
-    _projectId = _val.data.projectId;
-
-  let _store = window.localStorage.getItem("pprint-custom") || {},
-    _projects = window.localStorage.getItem("pprint-projects") || {};
-
-  if (typeof _store === "string") _store = JSON.parse(_store);
-  if (typeof _projects === "string") _projects = JSON.parse(_projects);
-
-  window.localStorage.setItem("pprint-custom", JSON.stringify(_store));
-  window.localStorage.setItem("pprint-projects", JSON.stringify(_projects));
-  if (_val.data.clear) window.location.reload();
-};
-function _zipFiles(_val) {
-  _val = _decode(_val);
-  window.ppclient
-    ._comm("zip-uploads", { files: _val.files, id: _val.projectId })
-    .catch(console.log);
-}
-
 ppClient.on("app-validated", appValidated);
-ppClient.on("project-saved", projectSaved);
-
-function _getProject(_id) {
-  let _store = window.localStorage.getItem("pprint-projects") || {};
-  if (typeof _store === "string") _store = JSON.parse(_store);
-  return _store[_id];
-}
-
-function _decode(_str) {
-  let _val = JSON.parse(decodeURIComponent(_str));
-  if (_val.projectId)
-    _val.preview = `https://s3-eu-west-1.amazonaws.com/pitchprint.io/previews/${_val.projectId}_1.jpg`;
-  return _val;
-}
 
 // Fetch data from projects
 
@@ -114,57 +75,83 @@ fetch(apiURL, {
   body: JSON.stringify({
     saveForLater: "",
     token:
-      "4ae0afe5028cb7fe6d28015768900358:e6a37f6eeafaefd9b8b2e94065f69372a7277c4e24341f8ebcbdf48a9c86932b671c02f414af1d45e5e5fd77abf35a44c5ff8a260fd8e695e00905e2c5185b8d9b446e2adf382f24714ad63270df5293e024475e746199092bb319f8b8e43e9ec005ca478ff8405fc61c496ad6b0ab7e5fdd8243d1dcb3ad958974fdd0e0e0bd986a27464e0f4cda4ada65275e02f5589b22e9472f03b06128146e3c02f8950c2b1214755937baf9f4ed3b20bdcefdfc590c2f6473766cc99b8947483a543aba3c9e1ecd41631f5d4bd99693b5443b374f4173231e4e6af02904fd4b96500da8",
+      "d41b6c2602ed7c2d401a37422511cb82:c9767277725223a2ccb6f04699ca93d4b61d4ec7295075e69b1a30aa091ba6abd2ffca0c2e60aa0dbc08127850792257f46842fbc9a14ce738e1658f01ab913e292fc5060751d6ca35781df9efa9856b4aa80bb70580a44e2c3f9f5fb5cd2ae1583766a0d077b6b04d7c1785b5c8136e778748f4c35511a2b7936eca613278412ab774c2425ae931e73114f998070cb3810533db94a3f68818178dc4bf4cefa9f8c72ad54f3025f73a6314538d6ea2c30b1f1f904b57cf2d7f54329dd5a0316f9028547dccddfa26dfd56c3da7a08c7171ac3988406384d64d0c7728b2d7074b",
   }),
 })
   .then((res) => res.json())
   .then((data) => {
     console.log(data);
-    // display data
 
     const contentPreview = document.getElementById("content");
 
     if (data.data.length > 0) {
       data.data.forEach((project) => {
-        // Create a div element for each project
         const projectDiv = document.createElement("div");
 
-        //style the div created for each project
         projectDiv.style.backgroundColor = "white";
         projectDiv.style.padding = "10px";
         projectDiv.style.borderRadius = "10px";
         projectDiv.style.boxShadow = "0 5px 10px rgba(0, 0, 0, 0.1)";
         projectDiv.style.margin = "15px";
 
-        projectDiv.innerHTML += `<img src="${project.previews}" />`;
-        projectDiv.innerHTML += `<p>User Id: ${project.userId}</p>`;
-        projectDiv.innerHTML += `<p>Project Id: ${project.id}</p>`;
+        projectDiv.innerHTML += `<img class="project-img" src="https://s3-eu-west-1.amazonaws.com/pitchprint.io/previews/${project.id}_1.jpg" />`;
+
+        projectDiv.innerHTML += `<h3>Project Title: ${project.title}</h3>`;
+        projectDiv.innerHTML += `<p><b>User Id:</b> ${project.userId}</p>`;
         projectDiv.innerHTML += `<button class="view-btn">View</button>`;
         projectDiv.innerHTML += `<button class="delete-btn">Delete</button>`;
 
-        // Add an event listener to the button
         projectDiv.querySelector(".view-btn").addEventListener("click", () => {
-          // customer will change the path back to the product page
           window.location.href = `index.html?id=${project.id} `;
         });
 
+        let _projects = window.localStorage.getItem("pprint-projects") || {};
+
+        if (typeof _projects === "string") _projects = JSON.parse(_projects);
+        _projects[project.id] = project;
+        window.localStorage.setItem(
+          "pprint-projects",
+          JSON.stringify(_projects)
+        );
+
         projectDiv
           .querySelector(".delete-btn")
-          .addEventListener("click", () => {
-            // remove the project from the projects list
-            if (_val.data.clear) {
-              _el.value = "";
-              delete _store[_productId];
-              delete _projects[_projectId];
-            } else {
-              _el.value = _projectId;
-              _store[_productId] = _val.data.values;
-              _projects[_projectId] = _val.data.values;
-              if (_projectId.substr(0, 2) === "U-") {
-                delete _projects[_projectId].previews;
-                _zipFiles(_val.data.values);
-                console.log(_projects[_projectId]);
+          .addEventListener("click", async () => {
+            const confirmDelete = confirm(
+              "Are you sure you want to delete this project?"
+            );
+            if (!confirmDelete) return;
+
+            try {
+              // send request to delete from API
+              const response = await fetch(`apiURL/${project.id}`, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (!response.ok) {
+                throw new Error("Failed to delete project from API");
               }
+
+              // delete from local storage
+              let _projects =
+                window.localStorage.getItem("pprint-projects") || {};
+
+              if (typeof _projects === "string")
+                _projects = JSON.parse(_projects);
+              delete _projects[project.id];
+              window.localStorage.setItem(
+                "pprint-projects",
+                JSON.stringify(_projects)
+              );
+
+              // Remove the project div from the DOM
+              projectDiv.remove();
+            } catch (error) {
+              console.error("Error deleting project:", error);
+              // Optionally display an error message to the user
             }
           });
 
@@ -172,3 +159,44 @@ fetch(apiURL, {
       });
     }
   });
+
+// projectDiv
+// .querySelector(".delete-btn")
+// .addEventListener("click", async () => {
+//   const confirmDelete = confirm(
+//     "Are you sure you want to delete this project?"
+//   );
+//   if (!confirmDelete) return;
+
+//   try {
+//     // send request to delete from API
+//     const response = await fetch(`apiURL/${project.id}`, {
+//       method: "DELETE",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to delete project from API");
+//     }
+
+//     // delete from local storage
+//     let _projects =
+//       window.localStorage.getItem("pprint-projects") || {};
+
+//     if (typeof _projects === "string")
+//       _projects = JSON.parse(_projects);
+//     delete _projects[project.id];
+//     window.localStorage.setItem(
+//       "pprint-projects",
+//       JSON.stringify(_projects)
+//     );
+
+//     // Remove the project div from the DOM
+//     projectDiv.remove();
+//   } catch (error) {
+//     console.error("Error deleting project:", error);
+//     // Optionally display an error message to the user
+//   }
+// });
