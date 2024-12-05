@@ -10,7 +10,7 @@ _launchButton.setAttribute("disabled", "disabled");
 var ppClient = new PitchPrintClient({
   apiKey: "f80b84b4eb5cc81a140cb90f52e824f6", //Kindly provide your own APIKey
   designId: "3d8f3899904ef2392795c681091600d0", //Change this to your designId
-  userId: "37063281-a764-4b5b-8163-cec7ab1884a9",
+  userId: "37063281-a764-4b5b-8163-cec7ab1884a9", //Change to your userId
   custom: true,
 });
 
